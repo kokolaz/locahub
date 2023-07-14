@@ -22,7 +22,6 @@ class ListAddress extends StatefulWidget {
 }
 
 class _ListAddressState extends State<ListAddress> {
-  final int _selectedIndex = -1;
   int value = 0;
 
   @override

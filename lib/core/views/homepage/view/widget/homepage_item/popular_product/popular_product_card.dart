@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:locahub/core/models/product_model.dart';
 import 'package:locahub/core/views/global/theme.dart';
 import 'package:locahub/core/views/product/view/detail_product.dart';
 
@@ -8,20 +9,24 @@ class PopularProductCard extends StatelessWidget {
   final int terjual;
   final String imageUrl;
   final String keterangan;
+  final Products product;
 
   const PopularProductCard(
       {super.key,
       required this.name,
       this.terjual = 0,
       required this.imageUrl,
-      required this.keterangan});
+      required this.keterangan,
+      required this.product});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         Get.to(() {
-          return const DetailProduct();
+          return DetailProduct(
+            product: product,
+          );
         });
       },
       child: Container(
@@ -41,7 +46,7 @@ class PopularProductCard extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 image: DecorationImage(
-                  image: AssetImage(imageUrl),
+                  image: NetworkImage(imageUrl),
                 ),
               ),
               child: Align(

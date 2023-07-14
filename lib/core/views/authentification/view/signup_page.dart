@@ -1,6 +1,4 @@
-//Memperbaiki icon mata pada password biar bisa aktif buka tutup
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:locahub/core/views/authentification/controller/signup_controller.dart';
 import 'login_page.dart';
@@ -17,7 +15,6 @@ class _SignUpPageState extends State<SignUpPage> {
 
   // ignore: unused_field
   final GlobalKey<FormState> _formState = GlobalKey<FormState>();
-  final RxBool isVisible = false.obs;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -167,45 +164,30 @@ class _SignUpPageState extends State<SignUpPage> {
                               fontSize: 14, fontWeight: FontWeight.w400),
                         ),
                         const SizedBox(height: 9),
-                        Obx(() {
-                          return TextFormField(
-                            controller: controller.passwordController,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Password wajib diisi";
-                              }
-                              return null;
-                            },
-                            obscureText: !isVisible.value,
-                            decoration: InputDecoration(
-                              fillColor: lightgreyColor,
-                              filled: true,
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide(color: lightgreyColor),
-                              ),
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  isVisible.value = !isVisible.value;
-                                  isVisible.refresh();
-                                },
-                                icon: Icon(
-                                  isVisible.value == true
-                                      ? FontAwesomeIcons.solidEyeSlash
-                                      : FontAwesomeIcons.solidEye,
-                                  size: 16,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide(color: lightgreyColor),
-                              ),
-                              hintText: '********',
-                              hintStyle: mutedTextStyle.copyWith(
-                                  fontSize: 14, fontWeight: FontWeight.w400),
+                        TextFormField(
+                          controller: controller.passwordController,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Password wajib diisi";
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            fillColor: lightgreyColor,
+                            filled: true,
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(color: lightgreyColor),
                             ),
-                          );
-                        }),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(color: lightgreyColor),
+                            ),
+                            hintText: '********',
+                            hintStyle: mutedTextStyle.copyWith(
+                                fontSize: 14, fontWeight: FontWeight.w400),
+                          ),
+                        ),
                         const SizedBox(height: 16),
                         Text(
                           'Telepon',

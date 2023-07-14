@@ -1,6 +1,7 @@
 import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:locahub/core/views/checkout/snap/controller/snap_controller.dart';
 import 'package:locahub/core/views/order/view/invoice.dart';
 import 'package:locahub/core/views/global/theme.dart';
 import 'package:intl/intl.dart';
@@ -44,8 +45,12 @@ class NotYetPaid extends StatefulWidget {
 }
 
 class _NotYetPaidState extends State<NotYetPaid> {
+  final mainC = Get.find<SnapController>();
+
   @override
   Widget build(BuildContext context) {
+    // Get.lazyPut(() => SnapController());
+    mainC.onClose();
     print(widget.costCourier);
     final totalPrice =
         widget.quantity! * widget.price!; // calculate the total price
@@ -105,8 +110,8 @@ class _NotYetPaidState extends State<NotYetPaid> {
             greyContainer(),
             product(totalPrice: totalPrice),
             greyContainer(),
-            customerNote(),
-            greyContainer(),
+            // customerNote(),
+            // greyContainer(),
             totalPayment(totalPrice: totalPrice, payTotal: payTotal),
             greyContainer(),
             buttons(),

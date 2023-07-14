@@ -3,16 +3,23 @@ import 'dart:developer';
 
 import 'package:http/http.dart' as http;
 import 'package:locahub/core/data/config.dart';
+import 'package:locahub/core/models/favorite_model.dart';
 
 class FavoriteServices {
-  Future<http.Response> get(String token) async {
-    print(token);
-    Uri url = Uri.parse(FavoriteConfig.main);
-    log(url.toString());
-    return await http.get(
+  Future<List<FavoriteModel>> fetchFavoriteModels(
+      String token, int userId) async {
+    Uri url = Uri.parse("${FavoriteConfig.main}/$userId");
+    final response = await http.get(
       url,
       headers: ApiConfig.tokenHeader(token),
     );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonData = jsonDecode(response.body);
+      return jsonData.map((data) => FavoriteModel.fromJson(data)).toList();
+    } else {
+      throw Exception('Failed to fetch favorite models');
+    }
   }
 
   Future<http.Response> delete(String token, favoriteId) async {
@@ -26,11 +33,9 @@ class FavoriteServices {
     );
   }
 
-  Future<http.Response> add(
-    String token,
-    int productId,
-    // ignore: avoid_init_to_null
-  ) async {
+  Future<http.Response> add(String token, int productId, int userId
+      // ignore: avoid_init_to_null
+      ) async {
     Uri url = Uri.parse(
       FavoriteConfig.main,
     );
@@ -38,6 +43,7 @@ class FavoriteServices {
 
     Map<String, String> body = {
       "products_id": productId.toString(),
+      "user_id": userId.toString(),
     };
 
     return await http.post(

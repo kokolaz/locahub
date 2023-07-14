@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:locahub/core/models/product_model.dart';
+import 'package:locahub/core/views/homepage/controller/product_controller.dart';
+import 'package:locahub/core/views/homepage/controller/store_controller.dart';
 import 'package:locahub/core/views/homepage/view/widget/search_result/product_card.dart';
 import 'package:locahub/core/views/homepage/view/search_page.dart';
 import 'package:locahub/core/views/product/view/widget/other_product.dart';
@@ -8,199 +11,215 @@ import '../../global/theme.dart';
 
 class StorePage extends StatefulWidget {
   final int initialIndex;
+  final String name;
 
-  const StorePage({super.key, required this.initialIndex});
+  const StorePage({super.key, required this.initialIndex, required this.name});
 
   @override
   State<StorePage> createState() => _StorePageState();
 }
 
 class _StorePageState extends State<StorePage> {
-  SliverAppBar showSliverAppBar() {
-    return SliverAppBar(
-      toolbarHeight: 258,
-      backgroundColor: whiteColor,
-      elevation: 0.0,
-      centerTitle: true,
-      automaticallyImplyLeading: false,
-      floating: true,
-      pinned: true,
-      snap: false,
-      title: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                padding: const EdgeInsets.only(left: 12),
-                alignment: Alignment.centerLeft,
-                icon: Icon(
-                  Icons.arrow_back_ios,
-                  color: darkgreyColor,
-                  size: 14,
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              IconButton(
-                padding: const EdgeInsets.only(right: 12),
-                alignment: Alignment.centerRight,
-                icon: Icon(
-                  Icons.search,
-                  color: darkgreyColor,
-                  size: 20,
-                ),
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) {
-                        return const SearchPage();
-                      },
-                    ),
-                  );
-                },
-              )
-            ],
-          ),
+  // final storeC = Get.find<StoreController>();
+  final storeC = Get.put<StoreController>(StoreController());
+  final productC = Get.find<ProductController>();
 
-          //storename
-          Container(
-            margin:
-                const EdgeInsets.only(left: 8, right: 8, top: 10, bottom: 24),
-            child: Column(
-              children: [
-                Image.asset('assets/images/store/kioskopifloratama.png'),
-                const SizedBox(height: 15),
-                Text(
-                  "Kios Kopi Floratama",
-                  style: darkTextStyle.copyWith(
-                      fontSize: 16, fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: 15),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.location_on,
-                      size: 13,
-                      color: textmutedColor,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      'Kab. Flores Timur, Nusa Tenggara Timur',
-                      style: mutedTextStyle.copyWith(
-                          fontSize: 12, fontWeight: FontWeight.w400),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 15),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.star,
-                      size: 13,
-                      color: orangeColor,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      '5.0',
-                      style: darkTextStyle.copyWith(
-                          fontSize: 12, fontWeight: FontWeight.w400),
-                    ),
-                    const SizedBox(width: 15),
-                    Image.asset('assets/images/store/storeproduct.png'),
-                    const SizedBox(width: 5),
-                    Text(
-                      '23 produk',
-                      style: darkTextStyle.copyWith(
-                          fontSize: 12, fontWeight: FontWeight.w400),
-                    ),
-                    const SizedBox(width: 15),
-                    Image.asset('assets/images/store/sold.png'),
-                    const SizedBox(width: 5),
-                    Text(
-                      '145 terjual',
-                      style: darkTextStyle.copyWith(
-                          fontSize: 12, fontWeight: FontWeight.w400),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      bottom: TabBar(
-        indicatorColor: orangeColor,
-        labelColor: orangeColor,
-        unselectedLabelColor: darkColor,
-        labelStyle:
-            orangeTextStyle.copyWith(fontSize: 14, fontWeight: FontWeight.w700),
-        unselectedLabelStyle:
-            darkTextStyle.copyWith(fontSize: 14, fontWeight: FontWeight.w400),
-        indicatorSize: TabBarIndicatorSize.label,
-        tabs: const [
-          Tab(
-            text: 'Toko',
-          ),
-          Tab(
-            text: 'Produk',
-          ),
-          Tab(
-            text: 'Kategori',
-          ),
-        ],
-      ),
-    );
+  @override
+  void initState() {
+    super.initState();
+    storeC.fetchStore(name: widget.name);
+    productC.fetchProducts();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: whiteColor,
-        body: DefaultTabController(
-          initialIndex: widget.initialIndex,
-          length: 3,
-          child: TabBarView(children: [
-            //buildStore
-            CustomScrollView(
-              slivers: [
-                showSliverAppBar(),
-                SliverList(
-                  delegate: SliverChildListDelegate([
-                    storeInformation(),
-                    popularProduct(),
-                    recomendationProduct(),
-                  ]),
-                ),
-              ],
+        body: SafeArea(
+          child: DefaultTabController(
+            initialIndex: widget.initialIndex,
+            length: 3,
+            child: NestedScrollView(
+              headerSliverBuilder: (context, _) {
+                return [
+                  SliverList(
+                    delegate:
+                        SliverChildListDelegate([showSliverAppBar(context)]),
+                  ),
+                ];
+              },
+              body: Column(
+                children: [
+                  TabBar(
+                    indicatorColor: orangeColor,
+                    labelColor: orangeColor,
+                    unselectedLabelColor: darkColor,
+                    labelStyle: orangeTextStyle.copyWith(
+                        fontSize: 14, fontWeight: FontWeight.w700),
+                    unselectedLabelStyle: darkTextStyle.copyWith(
+                        fontSize: 14, fontWeight: FontWeight.w400),
+                    indicatorSize: TabBarIndicatorSize.label,
+                    tabs: const [
+                      Tab(
+                        text: 'Toko',
+                      ),
+                      Tab(
+                        text: 'Produk',
+                      ),
+                      Tab(
+                        text: 'Kategori',
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                    child: TabBarView(children: [
+                      //buildStore
+                      CustomScrollView(
+                        slivers: [
+                          SliverList(
+                            delegate: SliverChildListDelegate([
+                              storeInformation(),
+                              popularProduct(),
+                              recomendationProduct(),
+                            ]),
+                          ),
+                        ],
+                      ),
+                      //buildProduct
+                      CustomScrollView(
+                        slivers: [
+                          // showSliverAppBar(),
+                          SliverList(
+                            delegate: SliverChildListDelegate([
+                              storeProduct(),
+                            ]),
+                          ),
+                        ],
+                      ),
+                      //buildCategory
+                      CustomScrollView(
+                        slivers: [
+                          // showSliverAppBar(),
+                          SliverList(
+                            delegate: SliverChildListDelegate([
+                              categoryFunc(),
+                            ]),
+                          ),
+                        ],
+                      ),
+                    ]),
+                  ),
+                ],
+              ),
             ),
-            //buildProduct
-            CustomScrollView(
-              slivers: [
-                showSliverAppBar(),
-                SliverList(
-                  delegate: SliverChildListDelegate([
-                    storeProduct(),
-                  ]),
-                ),
-              ],
-            ),
-            //buildCategory
-            CustomScrollView(
-              slivers: [
-                showSliverAppBar(),
-                SliverList(
-                  delegate: SliverChildListDelegate([
-                    categoryFunc(),
-                  ]),
-                ),
-              ],
-            ),
-          ]),
+          ),
         ));
+  }
+
+  Column showSliverAppBar(BuildContext context) {
+    return Column(children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            padding: const EdgeInsets.only(left: 12),
+            alignment: Alignment.centerLeft,
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: darkgreyColor,
+              size: 14,
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          IconButton(
+            padding: const EdgeInsets.only(right: 12),
+            alignment: Alignment.centerRight,
+            icon: Icon(
+              Icons.search,
+              color: darkgreyColor,
+              size: 20,
+            ),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) {
+                    return SearchPage();
+                  },
+                ),
+              );
+            },
+          )
+        ],
+      ),
+
+      //storename
+      Container(
+        margin: const EdgeInsets.only(left: 8, right: 8, top: 10, bottom: 24),
+        child: Column(
+          children: [
+            Image.asset('assets/images/store/kioskopifloratama.png'),
+            const SizedBox(height: 15),
+            Text(
+              widget.name,
+              style: darkTextStyle.copyWith(
+                  fontSize: 16, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 15),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.location_on,
+                  size: 13,
+                  color: textmutedColor,
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  storeC.listStore.first.city,
+                  style: mutedTextStyle.copyWith(
+                      fontSize: 12, fontWeight: FontWeight.w400),
+                ),
+              ],
+            ),
+            const SizedBox(height: 15),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.star,
+                  size: 13,
+                  color: orangeColor,
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  '5.0',
+                  style: darkTextStyle.copyWith(
+                      fontSize: 12, fontWeight: FontWeight.w400),
+                ),
+                const SizedBox(width: 15),
+                Image.asset('assets/images/store/storeproduct.png'),
+                const SizedBox(width: 5),
+                Text(
+                  '${storeC.listStore.first.products.length} produk',
+                  style: darkTextStyle.copyWith(
+                      fontSize: 12, fontWeight: FontWeight.w400),
+                ),
+                const SizedBox(width: 15),
+                Image.asset('assets/images/store/sold.png'),
+                const SizedBox(width: 5),
+                Text(
+                  '145 terjual',
+                  style: darkTextStyle.copyWith(
+                      fontSize: 12, fontWeight: FontWeight.w400),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ]);
   }
 
   Widget storeInformation() {
@@ -258,7 +277,10 @@ class _StorePageState extends State<StorePage> {
               GestureDetector(
                 onTap: () {
                   Get.to(() {
-                    return const StorePage(initialIndex: 1);
+                    return StorePage(
+                      initialIndex: 1,
+                      name: widget.name,
+                    );
                   });
                 },
                 child: Text(
@@ -271,52 +293,44 @@ class _StorePageState extends State<StorePage> {
           ),
         ),
         const SizedBox(height: 14),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Padding(
+        SizedBox(
+          height: 220,
+          child: ListView.builder(
+            shrinkWrap: true,
+            scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.only(left: 24),
-            child: Row(
-              children: const [
-                OtherProductCard(
-                  imageUrl: 'assets/images/product/kopirobustabali.png',
-                  name: 'Kopi Robusta Bali',
-                  price: 20000,
-                  rating: 4.9,
-                ),
-                OtherProductCard(
-                  imageUrl: 'assets/images/product/arutalakopitoraja.png',
-                  name: 'Arutala Kopi Toraja',
-                  price: 29999,
-                  rating: 4.9,
-                ),
-                OtherProductCard(
-                  imageUrl: 'assets/images/product/kopirobustasumatera.png',
-                  name: 'Kopi Robusta Sumatera',
-                  price: 20900,
-                  rating: 4.9,
-                ),
-                OtherProductCard(
-                  imageUrl: 'assets/images/product/kopirobustajava.png',
-                  name: 'Kopi Robusta Java',
-                  price: 58000,
-                  rating: 4.8,
-                ),
-                OtherProductCard(
-                  imageUrl: 'assets/images/product/kopirobusta.png',
-                  name: 'Kopi Robusta Watu',
-                  price: 25000,
-                  rating: 4.5,
-                ),
-                OtherProductCard(
-                  imageUrl: 'assets/images/product/kopibarasignature.png',
-                  name: 'Kopi Bara Signature',
-                  price: 72000,
-                  rating: 0,
-                ),
-              ],
-            ),
+            itemCount: productC.products
+                        .where(
+                            (products) => products.store!.name == widget.name)
+                        .length >
+                    5
+                ? 5
+                : productC.products
+                    .where((products) => products.store!.name == widget.name)
+                    .length,
+            itemBuilder: (BuildContext context, int index) {
+              final List<Products> categorySerupa = productC.products
+                  .where((products) =>
+                      products.store!.name ==
+                      widget
+                          .name) // Replace 'categorySerupaName' with the desired category name
+                  .toList();
+
+              if (index >= categorySerupa.length) {
+                return const SizedBox();
+              }
+
+              final product = categorySerupa[index];
+              return OtherProductCard(
+                product: product,
+                imageUrl: product.galleries!.first.url!,
+                name: product.name!,
+                price: double.parse(product.price!),
+                rating: double.parse(product.rating!.first.rating!),
+              );
+            },
           ),
-        ),
+        )
       ],
     );
   }
@@ -337,7 +351,10 @@ class _StorePageState extends State<StorePage> {
               GestureDetector(
                 onTap: () {
                   Get.to(() {
-                    return const StorePage(initialIndex: 1);
+                    return StorePage(
+                      initialIndex: 1,
+                      name: widget.name,
+                    );
                   });
                 },
                 child: Text(
@@ -349,41 +366,43 @@ class _StorePageState extends State<StorePage> {
             ],
           ),
           const SizedBox(height: 14),
-          Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 13,
-            runSpacing: 13,
-            children: const [
-              ProductCard(
-                  imageUrl: 'assets/images/product/floresmanggarai.png',
-                  name: 'Flores Manggarai 500g',
-                  price: 150000,
-                  rating: 4.9),
-              ProductCard(
-                  imageUrl: 'assets/images/product/floresgourmet.png',
-                  name: 'Flores Gourmet Coffee',
-                  price: 35000,
-                  rating: 4.9),
-              ProductCard(
-                  imageUrl: 'assets/images/product/floresbajawa.png',
-                  name: 'Flores Bajawa 200g Ko',
-                  price: 75000,
-                  rating: 5.0),
-              ProductCard(
-                  imageUrl: 'assets/images/product/dripcoffee.png',
-                  name: 'Drip Coffee 10g Arabic',
-                  price: 50000,
-                  rating: 4.8),
-              ProductCard(
-                  imageUrl: 'assets/images/product/kopirobusta.png',
-                  name: 'Kopi Robusta Watuag',
-                  price: 25000,
-                  rating: 4.5),
-              ProductCard(
-                  imageUrl: 'assets/images/product/tehhijaudiet.png',
-                  name: 'Single Origin Arabica Fl',
-                  price: 80000),
-            ],
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 13,
+              mainAxisSpacing: 13,
+              childAspectRatio: 1 / 1.5,
+            ),
+            itemCount: productC.products
+                .where((products) =>
+                    products.store!.name ==
+                    widget
+                        .name) // Replace 'categorySerupaName' with the desired category name
+                .length,
+            itemBuilder: (BuildContext context, int index) {
+              final List<Products> categorySerupa = productC.products
+                  .where((products) =>
+                      products.store!.name ==
+                      widget
+                          .name) // Replace 'categorySerupaName' with the desired category name
+                  .toList();
+
+              if (index >= categorySerupa.length) {
+                return const SizedBox();
+              }
+
+              final product = categorySerupa[index];
+
+              return ProductCard(
+                product: product,
+                imageUrl: product.galleries!.first.url!,
+                name: product.name!,
+                price: int.parse(product.price.toString()),
+                rating: double.parse(product.rating!.first.rating!),
+              );
+            },
           ),
         ],
       ),
@@ -395,41 +414,43 @@ class _StorePageState extends State<StorePage> {
       margin: const EdgeInsets.only(left: 24, right: 24, bottom: 24, top: 24),
       child: Column(
         children: [
-          Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 13,
-            runSpacing: 13,
-            children: const [
-              ProductCard(
-                  imageUrl: 'assets/images/product/floresmanggarai.png',
-                  name: 'Flores Manggarai 500g',
-                  price: 150000,
-                  rating: 4.9),
-              ProductCard(
-                  imageUrl: 'assets/images/product/floresgourmet.png',
-                  name: 'Flores Gourmet Coffee',
-                  price: 35000,
-                  rating: 4.9),
-              ProductCard(
-                  imageUrl: 'assets/images/product/floresbajawa.png',
-                  name: 'Flores Bajawa 200g Ko',
-                  price: 75000,
-                  rating: 5.0),
-              ProductCard(
-                  imageUrl: 'assets/images/product/dripcoffee.png',
-                  name: 'Drip Coffee 10g Arabic',
-                  price: 50000,
-                  rating: 4.8),
-              ProductCard(
-                  imageUrl: 'assets/images/product/kopirobusta.png',
-                  name: 'Kopi Robusta Watuag',
-                  price: 25000,
-                  rating: 4.5),
-              ProductCard(
-                  imageUrl: 'assets/images/product/tehhijaudiet.png',
-                  name: 'Single Origin Arabica Fl',
-                  price: 80000),
-            ],
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 13,
+              mainAxisSpacing: 13,
+              childAspectRatio: 1 / 1.5,
+            ),
+            itemCount: productC.products
+                .where((products) =>
+                    products.store!.name ==
+                    widget
+                        .name) // Replace 'categorySerupaName' with the desired category name
+                .length,
+            itemBuilder: (BuildContext context, int index) {
+              final List<Products> categorySerupa = productC.products
+                  .where((products) =>
+                      products.store!.name ==
+                      widget
+                          .name) // Replace 'categorySerupaName' with the desired category name
+                  .toList();
+
+              if (index >= categorySerupa.length) {
+                return const SizedBox();
+              }
+
+              final product = categorySerupa[index];
+
+              return ProductCard(
+                product: product,
+                imageUrl: product.galleries!.first.url!,
+                name: product.name!,
+                price: int.parse(product.price.toString()),
+                rating: double.parse(product.rating!.first.rating!),
+              );
+            },
           ),
         ],
       ),

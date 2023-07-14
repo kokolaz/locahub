@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:locahub/core/models/product_model.dart';
+import 'package:locahub/core/views/homepage/controller/product_controller.dart';
 import 'package:locahub/core/views/homepage/view/widget/search_result/skeleton_product.dart';
 import 'package:locahub/core/views/global/theme.dart';
 import 'package:locahub/core/views/product/view/detail_product.dart';
@@ -12,6 +14,8 @@ class PopularProductDetail extends StatefulWidget {
 }
 
 class _PopularProductDetailState extends State<PopularProductDetail> {
+  final ProductController productController = Get.put(ProductController());
+
   bool isLoading = true;
 
   @override
@@ -92,45 +96,39 @@ class _PopularProductDetailState extends State<PopularProductDetail> {
 
   Widget buildProduct() {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16, right: 24, left: 24),
-      child: Wrap(
-        crossAxisAlignment: WrapCrossAlignment.center,
-        spacing: 13,
-        runSpacing: 13,
-        children: const [
-          PopularProductDetailCard(
-            name: 'Madu Lebah',
-            terjual: 84,
-            imageUrl: 'assets/images/product/madulebah.png',
-            keterangan: 'TOP',
-          ),
-          PopularProductDetailCard(
-            name: 'Teh Herbal',
-            terjual: 51,
-            imageUrl: 'assets/images/product/tehherbal.png',
-            keterangan: 'TOP',
-          ),
-          PopularProductDetailCard(
-            name: 'Pupuk Kandang',
-            terjual: 43,
-            imageUrl: 'assets/images/product/pupukkandang.png',
-            keterangan: 'TOP',
-          ),
-          PopularProductDetailCard(
-            name: 'Jamu Herbal',
-            terjual: 84,
-            imageUrl: 'assets/images/product/jamuherbal.png',
-            keterangan: 'TOP',
-          ),
-          PopularProductDetailCard(
-            name: 'Biji Kopi Arabica',
-            terjual: 51,
-            imageUrl: 'assets/images/product/bijikopiarabica.png',
-            keterangan: 'TOP',
-          ),
-        ],
-      ),
-    );
+        margin: const EdgeInsets.only(bottom: 16, right: 24, left: 24),
+        child: GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 13,
+              mainAxisSpacing: 13,
+              childAspectRatio: 1 / 1.4),
+          itemCount: productController.products.length,
+          itemBuilder: (BuildContext context, int index) {
+            // Filter the list based on the "TERLARIS" tag
+            final List<Products> terlarisProducts = productController.products
+                .where((product) => product.tags!.contains("Terlaris"))
+                .toList();
+
+            // Check if the current index is within the filtered list's bounds
+            if (index >= terlarisProducts.length) {
+              return const SizedBox(); // Return an empty widget if the index is out of bounds
+            }
+
+            // Access the filtered product at the current index
+            final product = terlarisProducts[index];
+
+            return PopularProductDetailCard(
+              product: product,
+              name: product.name!,
+              terjual: 84,
+              imageUrl: product.galleries!.first.url!,
+              keterangan: 'TOP',
+            );
+          },
+        ));
   }
 }
 
@@ -139,20 +137,24 @@ class PopularProductDetailCard extends StatelessWidget {
   final int terjual;
   final String imageUrl;
   final String keterangan;
+  final Products product;
 
   const PopularProductDetailCard(
       {super.key,
       required this.name,
       this.terjual = 0,
       required this.imageUrl,
-      required this.keterangan});
+      required this.keterangan,
+      required this.product});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         Get.to(() {
-          return const DetailProduct();
+          return DetailProduct(
+            product: product,
+          );
         });
       },
       child: Card(
@@ -174,7 +176,7 @@ class PopularProductDetailCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   image: DecorationImage(
-                      image: AssetImage(imageUrl), fit: BoxFit.cover),
+                      image: NetworkImage(imageUrl), fit: BoxFit.cover),
                 ),
                 child: Align(
                   alignment: Alignment.topLeft,

@@ -3,16 +3,9 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:get/get.dart';
 import 'package:locahub/core/models/product_model.dart' as model;
 import 'package:locahub/core/views/homepage/controller/main_controller.dart';
-import 'package:locahub/core/views/homepage/view/widget/homepage_item/category/categories/beauty.dart';
-import 'package:locahub/core/views/homepage/view/widget/homepage_item/category/categories/fashion.dart';
-import 'package:locahub/core/views/homepage/view/widget/homepage_item/category/categories/food_beverage.dart';
-import 'package:locahub/core/views/homepage/view/widget/homepage_item/category/categories/handycraft.dart';
-import 'package:locahub/core/views/homepage/view/widget/homepage_item/category/categories/health.dart';
-import 'package:locahub/core/views/homepage/view/widget/homepage_item/category/categories/herbs.dart';
+import 'package:locahub/core/views/homepage/view/widget/homepage_item/category/categories/category_screen.dart';
 import 'package:locahub/core/views/homepage/controller/product_controller.dart';
 import 'package:locahub/core/views/homepage/view/search_page.dart';
-import 'package:locahub/core/views/homepage/view/widget/homepage_item/category/categories/agriculture.dart';
-import 'package:locahub/core/views/homepage/view/widget/homepage_item/category/category.dart';
 import 'package:locahub/core/views/homepage/view/widget/homepage_item/category/category_card.dart';
 import 'package:locahub/core/views/homepage/view/widget/homepage_item/popular_product/popular_product.dart';
 import 'package:locahub/core/views/homepage/view/widget/homepage_item/popular_product/popular_product_card.dart';
@@ -32,6 +25,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final ProductController productController = Get.put(ProductController());
   final mainC = Get.find<MainController>();
+
   //final categoryC = Get.put(CategoryController());
 
   @override
@@ -159,7 +153,7 @@ class _HomePageState extends State<HomePage> {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) {
-              return const SearchPage();
+              return SearchPage();
             },
           ),
         );
@@ -262,7 +256,8 @@ class _HomePageState extends State<HomePage> {
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => const Category(),
+                          builder: (context) =>
+                              const CategoryScreen(initialIndex: 0),
                         ),
                       );
                     },
@@ -285,7 +280,9 @@ class _HomePageState extends State<HomePage> {
                     name: 'Handycraft',
                     onTap: () {
                       Get.to(() {
-                        return const HandyCraft();
+                        return const CategoryScreen(
+                          initialIndex: 0,
+                        );
                       });
                     },
                   ),
@@ -294,7 +291,9 @@ class _HomePageState extends State<HomePage> {
                     name: 'Makan & Minum',
                     onTap: () {
                       Get.to(() {
-                        return const FoodBeverage();
+                        return const CategoryScreen(
+                          initialIndex: 1,
+                        );
                       });
                     },
                   ),
@@ -303,7 +302,9 @@ class _HomePageState extends State<HomePage> {
                     name: 'Herbal',
                     onTap: () {
                       Get.to(() {
-                        return const Herbs();
+                        return const CategoryScreen(
+                          initialIndex: 2,
+                        );
                       });
                     },
                   ),
@@ -312,7 +313,9 @@ class _HomePageState extends State<HomePage> {
                     name: 'Fashion',
                     onTap: () {
                       Get.to(() {
-                        return const Fashion();
+                        return const CategoryScreen(
+                          initialIndex: 3,
+                        );
                       });
                     },
                   ),
@@ -321,7 +324,9 @@ class _HomePageState extends State<HomePage> {
                     name: 'Pertanian',
                     onTap: () {
                       Get.to(() {
-                        return const Agriculture();
+                        return const CategoryScreen(
+                          initialIndex: 4,
+                        );
                       });
                     },
                   ),
@@ -330,7 +335,9 @@ class _HomePageState extends State<HomePage> {
                     name: 'Kecantikan',
                     onTap: () {
                       Get.to(() {
-                        return const Beauty();
+                        return const CategoryScreen(
+                          initialIndex: 5,
+                        );
                       });
                     },
                   ),
@@ -339,7 +346,9 @@ class _HomePageState extends State<HomePage> {
                     name: 'Kesehatan',
                     onTap: () {
                       Get.to(() {
-                        return const Health();
+                        return const CategoryScreen(
+                          initialIndex: 6,
+                        );
                       });
                     },
                   ),
@@ -422,38 +431,40 @@ class _HomePageState extends State<HomePage> {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Container(
+                height: 195,
                 margin: const EdgeInsets.only(left: 24),
                 child: Row(
-                  children: const [
-                    PopularProductCard(
-                      name: 'Madu Lebah',
-                      terjual: 84,
-                      imageUrl: 'assets/images/product/madulebah.png',
-                      keterangan: 'TOP',
-                    ),
-                    PopularProductCard(
-                      name: 'Teh Herbal',
-                      terjual: 51,
-                      imageUrl: 'assets/images/product/tehherbal.png',
-                      keterangan: 'TOP',
-                    ),
-                    PopularProductCard(
-                      name: 'Pupuk Kandang',
-                      terjual: 43,
-                      imageUrl: 'assets/images/product/pupukkandang.png',
-                      keterangan: 'TOP',
-                    ),
-                    PopularProductCard(
-                      name: 'Jamu Herbal',
-                      terjual: 84,
-                      imageUrl: 'assets/images/product/jamuherbal.png',
-                      keterangan: 'TOP',
-                    ),
-                    PopularProductCard(
-                      name: 'Biji Kopi Arabica',
-                      terjual: 51,
-                      imageUrl: 'assets/images/product/bijikopiarabica.png',
-                      keterangan: 'TOP',
+                  children: [
+                    ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      shrinkWrap: true,
+                      itemCount: productController.products.length >= 5
+                          ? 5
+                          : productController.products.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        // Filter the list based on the "TERLARIS" tag
+                        final List<model.Products> terlarisProducts =
+                            productController.products
+                                .where((product) =>
+                                    product.tags!.contains("Terlaris"))
+                                .toList();
+
+                        // Check if the current index is within the filtered list's bounds
+                        if (index >= terlarisProducts.length) {
+                          return const SizedBox(); // Return an empty widget if the index is out of bounds
+                        }
+
+                        // Access the filtered product at the current index
+                        final product = terlarisProducts[index];
+
+                        return PopularProductCard(
+                          product: product,
+                          name: product.name!,
+                          terjual: 84,
+                          imageUrl: product.galleries!.first.url!,
+                          keterangan: 'TOP',
+                        );
+                      },
                     ),
                   ],
                 ),

@@ -443,7 +443,10 @@ class Checkout2Controller extends GetxController {
           // inspect(jsonData);
           Get.off(
             () => const SnapView(),
-            arguments: jsonData["transaction"]["snap_token"],
+            arguments: [
+              jsonData["transaction"]["snap_token"],
+              jsonData["transaction"]
+            ],
           )!
               .then((_) {
             Get.to(() {

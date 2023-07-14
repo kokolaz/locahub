@@ -1,12 +1,9 @@
-//perubahan di chat message jadi pesanan
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:locahub/core/views/checkout/cart/view/cart_page_view.dart';
 import 'package:locahub/core/views/homepage/controller/main_controller.dart';
 import 'package:locahub/core/views/profile/view/profile_info_view.dart';
 import 'package:locahub/core/views/message_customer/view/message_customer.dart';
-import 'package:locahub/core/views/transaction_index/view/transaction_index_view.dart';
 import '../../homepage.dart';
 import '../../../../favorite/view/favorite.dart';
 import '../../../../global/theme.dart';
@@ -25,8 +22,7 @@ class _BottomNavbarState extends State<BottomNavbar> {
     const HomePage(),
     const FavoritePage(),
     CartPageView(),
-    //const MessageCustomer(),
-    const TransactionIndexView(),
+    const MessageCustomer(),
     const ProfileView(),
   ];
   final mainC = Get.put(MainController());
@@ -99,22 +95,12 @@ class _BottomNavbarState extends State<BottomNavbar> {
                     ),
                     label: 'Keranjang',
                   ),
-                  // BottomNavigationBarItem(
-                  //   icon: Padding(
-                  //     padding: EdgeInsets.only(bottom: 3),
-                  //     child: Icon(Icons.message),
-                  //   ),
-                  //   label: 'Pesan',
-                  // ),
                   BottomNavigationBarItem(
                     icon: Padding(
-                      padding: EdgeInsets.only(bottom: 6, top: 3),
-                      child: Icon(
-                        FontAwesomeIcons.boxesStacked,
-                        size: 20,
-                      ),
+                      padding: EdgeInsets.only(bottom: 3),
+                      child: Icon(Icons.message),
                     ),
-                    label: 'Pesanan',
+                    label: 'Pesan',
                   ),
                   BottomNavigationBarItem(
                     icon: Padding(

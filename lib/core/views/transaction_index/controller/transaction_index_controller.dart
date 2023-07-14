@@ -3,8 +3,10 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:locahub/core/models/transaction_model.dart';
 import 'package:locahub/core/services/network_services/transaction_service.dart';
 import 'package:locahub/core/services/pref_services/user_pref_service.dart';
+import 'package:http/http.dart' as http;
 
 class TransactionIndexController extends GetxController {
   final UserPrefService userPrefService = UserPrefService();
@@ -102,6 +104,24 @@ class TransactionIndexController extends GetxController {
               "Untuk melihat daftar transaksi harap untuk login terlebih dahulu",
         ),
       );
+    }
+  }
+
+  Future<TransactionModel> fetchTransaction({int? idTransaksi}) async {
+    String? token = userPrefService.readToken();
+
+    var url = Uri.parse('http://locahub.my.id/api/transaction/$idTransaksi');
+    var response = await http.get(url, headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    });
+
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      var transactionModel = TransactionModel.fromJson(jsonResponse);
+      return transactionModel;
+    } else {
+      throw Exception('Failed to load transaction');
     }
   }
 }

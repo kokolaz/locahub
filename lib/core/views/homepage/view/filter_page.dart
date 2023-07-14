@@ -194,7 +194,9 @@ class _FilterPageState extends State<FilterPage> {
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
                       builder: (_) {
-                        return const SearchResultPage();
+                        return const SearchResultPage(
+                          text: "",
+                        );
                       },
                     ),
                   );
@@ -221,7 +223,9 @@ class _FilterPageState extends State<FilterPage> {
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
                       builder: (_) {
-                        return const SearchResultPage();
+                        return const SearchResultPage(
+                          text: "",
+                        );
                       },
                     ),
                   );

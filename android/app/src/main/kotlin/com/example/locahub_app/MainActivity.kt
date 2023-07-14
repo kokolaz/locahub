@@ -1,4 +1,4 @@
-package com.example.locahub
+package com.example.locahub_app
 
 import io.flutter.embedding.android.FlutterActivity
 

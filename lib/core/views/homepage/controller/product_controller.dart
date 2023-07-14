@@ -64,16 +64,31 @@ class ProductController extends GetxController {
     }
   }
 
-  Future<void> searchProduct({terlaris = ""}) async {
+  Future<void> searchProduct({name = ""}) async {
     try {
-      var response = await _apiServices.get(uri: "products");
+      var response = await _apiServices.get(uri: "products?name=$name");
 
+      print("object");
+      print(response.statusCode);
       if (response.statusCode == 200) {
+        print("object dalam");
+
         var data = jsonDecode(response.body);
-        for (var element in data['data']['data']) {
-          _listproducts.add(Products.fromJson(element));
+        print(data);
+        if (data['data']['data'] is List<dynamic>) {
+          List<dynamic> dataList = data['data']['data'];
+          for (var element in dataList) {
+            _listsearchProduct.add(Products.fromJson(element));
+          }
+          print("before : ${_isLoading.value}");
+          _isLoading.value = false;
+          print("after : ${_isLoading.value}");
+
+          print(data);
+          print(Products.fromJson(dataList[0]));
+        } else {
+          print('Invalid data format');
         }
-        _isLoading.value = false;
       } else {
         throw Exception('Failed to load products');
       }

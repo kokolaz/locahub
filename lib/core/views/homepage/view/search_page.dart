@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:locahub/core/views/homepage/controller/product_controller.dart';
 import '../../global/theme.dart';
 import 'widget/search_page/popular_search.dart';
 import 'widget/search_page/history_search.dart';
 import 'search_result.dart';
 
 class SearchPage extends StatelessWidget {
-  const SearchPage({super.key});
-
+  SearchPage({super.key});
+  final ProductController productController = Get.put(ProductController());
+  final TextEditingController searchController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     Widget searchBar() {
@@ -14,12 +17,15 @@ class SearchPage extends StatelessWidget {
         height: 43,
         margin: const EdgeInsets.only(bottom: 22),
         child: TextFormField(
+          controller: searchController,
           textInputAction: TextInputAction.go,
           onFieldSubmitted: (value) {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) {
-                  return const SearchResultPage();
+                  return SearchResultPage(
+                    text: searchController.text,
+                  );
                 },
               ),
             );

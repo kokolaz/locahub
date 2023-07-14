@@ -385,8 +385,11 @@ class TransactionIndexView extends GetView<TransactionIndexController> {
                                 func: () {
                                   Get.to(
                                     () => const SnapView(),
-                                    arguments: controller.transactions[i]
-                                        ["snap_token"],
+                                    arguments: [
+                                      controller.transactions[i]["snap_token"],
+                                      controller.transactions[i],
+                                      // [i]
+                                    ],
                                   )!
                                       .then((_) {
                                     controller.transactions.clear();

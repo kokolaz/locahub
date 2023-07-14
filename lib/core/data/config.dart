@@ -54,6 +54,10 @@ class CartConfig {
   static String main = "${ApiConfig.api}/cart";
 }
 
+class StoreConfig {
+  static String main = "${ApiConfig.api}/store";
+}
+
 class AddressConfig {
   static String main = "${ApiConfig.api}/address";
   static String all = "${ApiConfig.api}/address/all";

@@ -1,11 +1,13 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:locahub/core/models/user_model.dart';
 import 'package:locahub/core/services/network_services/cart_services.dart';
 import 'package:locahub/core/services/network_services/favorite_services.dart';
 import 'package:locahub/core/services/pref_services/user_pref_service.dart';
 import 'package:locahub/core/views/checkout/cart/view/cart_page_view.dart';
 import 'package:locahub/core/views/favorite/view/favorite.dart';
+import 'package:locahub/core/views/homepage/controller/main_controller.dart';
 import 'package:locahub/core/views/homepage/controller/product_controller.dart';
 import 'package:locahub/core/views/homepage/view/widget/search_result/product_card.dart';
 import 'package:locahub/core/views/global/theme.dart';
@@ -290,7 +292,11 @@ class _DetailProductState extends State<DetailProduct> {
                   backgroundColor: greyColor),
               child: Image.asset('assets/icon/messages.png'),
               onPressed: () {
-                Get.to(const DetailChat());
+                print(widget.product?.storeId);
+                print(widget.product?.store!.name!);
+                Get.to(DetailChat(
+                    idStore: widget.product!.storeId!,
+                    nameStore: widget.product!.store!.name!));
               },
             ),
           ),
@@ -497,13 +503,15 @@ class _DetailProductState extends State<DetailProduct> {
                         color: darkgreyColor,
                         size: 20,
                       ),
-                      onTap: () {
+                      onTap: () async {
                         setState(() {
                           isFavorite = !isFavorite;
                         });
+                        Future<User> usera = MainController().getUsers();
+                        int userId = await usera.then((user) => user.id!);
                         String? token = userPrefService.readToken();
                         favoriteServices
-                            .add(token!, widget.product!.id!)
+                            .add(token!, widget.product!.id!, userId)
                             .then((value) =>
                                 //Get.to(const FavoritePage())
                                 Get.to(() => const FavoritePage()));
@@ -679,7 +687,8 @@ class _DetailProductState extends State<DetailProduct> {
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => const StorePage(initialIndex: 0),
+                  builder: (context) => StorePage(
+                      initialIndex: 0, name: widget.product!.store!.name!),
                 ),
               );
             },
@@ -872,7 +881,10 @@ class _DetailProductState extends State<DetailProduct> {
                 GestureDetector(
                   onTap: () {
                     Get.to(() {
-                      return const StorePage(initialIndex: 1);
+                      return StorePage(
+                        initialIndex: 1,
+                        name: widget.product!.store!.name!,
+                      );
                     });
                   },
                   child: Text(
@@ -885,52 +897,41 @@ class _DetailProductState extends State<DetailProduct> {
             ),
           ),
           const SizedBox(height: 14),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Padding(
+          SizedBox(
+            height: 220,
+            child: ListView.builder(
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.only(left: 24),
-              child: Row(
-                children: const [
-                  OtherProductCard(
-                    imageUrl: 'assets/images/product/kopirobustabali.png',
-                    name: 'Kopi Robusta Bali',
-                    price: 20000,
-                    rating: 4.9,
-                  ),
-                  OtherProductCard(
-                    imageUrl: 'assets/images/product/arutalakopitoraja.png',
-                    name: 'Arutala Kopi Toraja',
-                    price: 29999,
-                    rating: 4.9,
-                  ),
-                  OtherProductCard(
-                    imageUrl: 'assets/images/product/kopirobustasumatera.png',
-                    name: 'Kopi Robusta Sumatera',
-                    price: 20900,
-                    rating: 4.9,
-                  ),
-                  OtherProductCard(
-                    imageUrl: 'assets/images/product/kopirobustajava.png',
-                    name: 'Kopi Robusta Java',
-                    price: 58000,
-                    rating: 4.8,
-                  ),
-                  OtherProductCard(
-                    imageUrl: 'assets/images/product/kopirobusta.png',
-                    name: 'Kopi Robusta Watu',
-                    price: 25000,
-                    rating: 4.5,
-                  ),
-                  OtherProductCard(
-                    imageUrl: 'assets/images/product/kopibarasignature.png',
-                    name: 'Kopi Bara Signature',
-                    price: 72000,
-                    rating: 0,
-                  ),
-                ],
-              ),
+              itemCount: productC.products
+                  .where((products) =>
+                      products.store!.name ==
+                      widget.product!.store!
+                          .name!) // Replace 'categorySerupaName' with the desired category name
+                  .length,
+              itemBuilder: (BuildContext context, int index) {
+                final List<Products> categorySerupa = productC.products
+                    .where((products) =>
+                        products.store!.name ==
+                        widget.product!.store!
+                            .name!) // Replace 'categorySerupaName' with the desired category name
+                    .toList();
+
+                if (index >= categorySerupa.length) {
+                  return const SizedBox();
+                }
+
+                final product = categorySerupa[index];
+                return OtherProductCard(
+                  product: product,
+                  imageUrl: product.galleries!.first.url!,
+                  name: product.name!,
+                  price: double.parse(product.price!),
+                  rating: double.parse(product.rating!.first.rating!),
+                );
+              },
             ),
-          ),
+          )
         ],
       ),
     );
@@ -952,7 +953,9 @@ class _DetailProductState extends State<DetailProduct> {
               GestureDetector(
                 onTap: () {
                   Get.to(() {
-                    return const SimilarProductDetail();
+                    return SimilarProductDetail(
+                      product: widget.product,
+                    );
                   });
                 },
                 child: Text(
@@ -964,42 +967,80 @@ class _DetailProductState extends State<DetailProduct> {
             ],
           ),
           const SizedBox(height: 14),
-          Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 13,
-            runSpacing: 13,
-            children: const [
-              ProductCard(
-                  imageUrl: 'assets/images/product/floresmanggarai.png',
-                  name: 'Flores Manggarai 500g',
-                  price: 150000,
-                  rating: 4.9),
-              ProductCard(
-                  imageUrl: 'assets/images/product/floresgourmet.png',
-                  name: 'Flores Gourmet Coffee',
-                  price: 35000,
-                  rating: 4.9),
-              ProductCard(
-                  imageUrl: 'assets/images/product/floresbajawa.png',
-                  name: 'Flores Bajawa 200g Ko',
-                  price: 75000,
-                  rating: 5.0),
-              ProductCard(
-                  imageUrl: 'assets/images/product/dripcoffee.png',
-                  name: 'Drip Coffee 10g Arabic',
-                  price: 50000,
-                  rating: 4.8),
-              ProductCard(
-                  imageUrl: 'assets/images/product/kopirobusta.png',
-                  name: 'Kopi Robusta Watuag',
-                  price: 25000,
-                  rating: 4.5),
-              ProductCard(
-                  imageUrl: 'assets/images/product/tehhijaudiet.png',
-                  name: 'Single Origin Arabica Fl',
-                  price: 80000),
-            ],
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 13,
+              mainAxisSpacing: 13,
+              childAspectRatio: 1 / 1.5,
+            ),
+            itemCount: productC.products
+                .where((products) =>
+                    products.category!.name ==
+                    widget.product!.category!
+                        .name!) // Replace 'categorySerupaName' with the desired category name
+                .length,
+            itemBuilder: (BuildContext context, int index) {
+              final List<Products> categorySerupa = productC.products
+                  .where((products) =>
+                      products.category!.name ==
+                      widget.product!.category!
+                          .name!) // Replace 'categorySerupaName' with the desired category name
+                  .toList();
+
+              if (index >= categorySerupa.length) {
+                return const SizedBox();
+              }
+
+              final product = categorySerupa[index];
+
+              return ProductCard(
+                product: product,
+                imageUrl: product.galleries!.first.url!,
+                name: product.name!,
+                price: int.parse(product.price.toString()),
+                rating: double.parse(product.rating!.first.rating!),
+              );
+            },
           ),
+          // const Wrap(
+          //   crossAxisAlignment: WrapCrossAlignment.center,
+          //   spacing: 13,
+          //   runSpacing: 13,
+          //   children: [
+          //     ProductCard(
+          //         imageUrl: 'assets/images/product/floresmanggarai.png',
+          //         name: 'Flores Manggarai 500g',
+          //         price: 150000,
+          //         rating: 4.9),
+          //     ProductCard(
+          //         imageUrl: 'assets/images/product/floresgourmet.png',
+          //         name: 'Flores Gourmet Coffee',
+          //         price: 35000,
+          //         rating: 4.9),
+          //     ProductCard(
+          //         imageUrl: 'assets/images/product/floresbajawa.png',
+          //         name: 'Flores Bajawa 200g Ko',
+          //         price: 75000,
+          //         rating: 5.0),
+          //     ProductCard(
+          //         imageUrl: 'assets/images/product/dripcoffee.png',
+          //         name: 'Drip Coffee 10g Arabic',
+          //         price: 50000,
+          //         rating: 4.8),
+          //     ProductCard(
+          //         imageUrl: 'assets/images/product/kopirobusta.png',
+          //         name: 'Kopi Robusta Watuag',
+          //         price: 25000,
+          //         rating: 4.5),
+          //     ProductCard(
+          //         imageUrl: 'assets/images/product/tehhijaudiet.png',
+          //         name: 'Single Origin Arabica Fl',
+          //         price: 80000),
+          //   ],
+          // ),
         ],
       ),
     );
@@ -1007,7 +1048,8 @@ class _DetailProductState extends State<DetailProduct> {
 }
 
 class SimilarProductDetail extends StatefulWidget {
-  const SimilarProductDetail({super.key});
+  const SimilarProductDetail({super.key, this.product});
+  final Products? product;
 
   @override
   State<SimilarProductDetail> createState() => _SimilarProductDetailState();
@@ -1015,6 +1057,7 @@ class SimilarProductDetail extends StatefulWidget {
 
 class _SimilarProductDetailState extends State<SimilarProductDetail> {
   bool isLoading = true;
+  final productC = Get.find<ProductController>();
 
   @override
   void initState() {
@@ -1086,41 +1129,43 @@ class _SimilarProductDetailState extends State<SimilarProductDetail> {
   Widget buildProduct() {
     return Container(
       margin: const EdgeInsets.only(bottom: 16, right: 24, left: 24),
-      child: Wrap(
-        crossAxisAlignment: WrapCrossAlignment.center,
-        spacing: 13,
-        runSpacing: 13,
-        children: const [
-          ProductCard(
-              imageUrl: 'assets/images/product/floresmanggarai.png',
-              name: 'Flores Manggarai 500g',
-              price: 150000,
-              rating: 4.9),
-          ProductCard(
-              imageUrl: 'assets/images/product/floresgourmet.png',
-              name: 'Flores Gourmet Coffee',
-              price: 35000,
-              rating: 4.9),
-          ProductCard(
-              imageUrl: 'assets/images/product/floresbajawa.png',
-              name: 'Flores Bajawa 200g Ko',
-              price: 75000,
-              rating: 5.0),
-          ProductCard(
-              imageUrl: 'assets/images/product/dripcoffee.png',
-              name: 'Drip Coffee 10g Arabic',
-              price: 50000,
-              rating: 4.8),
-          ProductCard(
-              imageUrl: 'assets/images/product/kopirobusta.png',
-              name: 'Kopi Robusta Watuag',
-              price: 25000,
-              rating: 4.5),
-          ProductCard(
-              imageUrl: 'assets/images/product/tehhijaudiet.png',
-              name: 'Single Origin Arabica Fl',
-              price: 80000),
-        ],
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 13,
+          mainAxisSpacing: 13,
+          childAspectRatio: 1 / 1.5,
+        ),
+        itemCount: productC.products
+            .where((products) =>
+                products.category!.name ==
+                widget.product!.category!
+                    .name!) // Replace 'categorySerupaName' with the desired category name
+            .length,
+        itemBuilder: (BuildContext context, int index) {
+          final List<Products> categorySerupa = productC.products
+              .where((products) =>
+                  products.category!.name ==
+                  widget.product!.category!
+                      .name!) // Replace 'categorySerupaName' with the desired category name
+              .toList();
+
+          if (index >= categorySerupa.length) {
+            return const SizedBox();
+          }
+
+          final product = categorySerupa[index];
+
+          return ProductCard(
+            product: product,
+            imageUrl: product.galleries!.first.url!,
+            name: product.name!,
+            price: int.parse(product.price.toString()),
+            rating: double.parse(product.rating!.first.rating!),
+          );
+        },
       ),
     );
   }

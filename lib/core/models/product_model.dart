@@ -4,8 +4,6 @@
 
 import 'dart:convert';
 
-import 'package:intl/intl.dart';
-
 ProductsModel productsModelFromJson(String str) =>
     ProductsModel.fromJson(json.decode(str));
 

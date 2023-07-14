@@ -1,16 +1,30 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:ui';
 
 import 'package:get/get.dart';
+import 'package:locahub/core/views/transaction_index/controller/transaction_index_controller.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class SnapController extends GetxController {
   final RxString midtransSnapToken = "".obs;
+  Map<String, dynamic> argu = {};
+  // List<int> ii = [0];
   final Rx<WebViewController> webViewController2 = WebViewController().obs;
+  final controller = Get.put(TransactionIndexController());
+
   @override
   // ignore: unnecessary_overrides
   void onInit() {
-    midtransSnapToken.value = Get.arguments;
+    List argumentData = Get.arguments;
+    Map<String, dynamic> argumen2 = argumentData[1];
+    String argumen1 = argumentData[0];
+    argu = argumen2;
+    // List<int> i = argumentData[2];
+    // ii = i;
+    midtransSnapToken.value = argumen1;
+    log(jsonEncode(argumen2));
     midtransSnapToken.refresh();
     log(midtransSnapToken.value, name: "snap_token");
     webViewController2.value.setJavaScriptMode(JavaScriptMode.unrestricted);
@@ -28,8 +42,7 @@ class SnapController extends GetxController {
       ),
     );
     webViewController2.refresh();
-    webViewController2.value.loadHtmlString(
-        """
+    webViewController2.value.loadHtmlString("""
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -59,14 +72,63 @@ class SnapController extends GetxController {
   }
 
   @override
-  void onReady() {
+  void onReady() async {
     log("bismillah 1");
     super.onReady();
   }
 
   @override
   // ignore: unnecessary_overrides
-  void onClose() {
-    super.onClose();
+  void onClose() async {
+    log("bisa 1");
+    log(jsonEncode(argu));
+    log(argu['payment_status']);
+
+    await controller
+        .fetchTransaction(idTransaksi: argu['id'])
+        .then((value) async {
+      var transaction =
+          await controller.fetchTransaction(idTransaksi: argu['id']);
+      var paymentStatus = transaction.transaction.paymentStatus;
+
+      print("Payment Status: $paymentStatus");
+      if (paymentStatus == "dibayar") {
+        showNotification();
+      }
+    }).then((value) => super.onClose());
+
+    log(midtransSnapToken.value);
+
+    // showNotification();
+
+    print("object2");
+  }
+
+  Future<void> showNotification() async {
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'channel_id', // Replace with your own channel ID
+      'channel_name', // Replace with your own channel name
+      channelDescription:
+          'channel_description', // Replace with your own channel description
+      importance: Importance.max,
+      priority: Priority.high,
+    );
+
+    // const IOSNotificationDetails iOSPlatformChannelSpecifics = IOSNotificationDetails();
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+      // iOS: iOSPlatformChannelSpecifics,
+    );
+
+    await flutterLocalNotificationsPlugin.show(
+      0, // Notification ID
+      'Pembayaran Berhasil', // Notification title
+      'Terima Kasih sudah melakukan pembayaran', // Notification body
+      platformChannelSpecifics, // Notification details
+      payload: 'notification_payload', // Optional payload
+    );
   }
 }

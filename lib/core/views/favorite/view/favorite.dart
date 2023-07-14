@@ -1,11 +1,19 @@
-//penghapusan sementara isi halaman favorit jd kosong biar sesuai akun baru yg harusnya kosong
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:locahub/core/models/favorite_model.dart';
+import 'package:locahub/core/models/user_model.dart';
+import 'package:locahub/core/models/product_model.dart' as model;
+
+import 'package:locahub/core/services/network_services/favorite_services.dart';
+import 'package:locahub/core/services/pref_services/user_pref_service.dart';
 import 'package:locahub/core/views/global/theme.dart';
+import 'package:locahub/core/views/homepage/controller/main_controller.dart';
+import 'package:locahub/core/views/homepage/controller/product_controller.dart';
 import 'package:locahub/core/views/homepage/view/widget/search_result/product_card.dart';
 import 'package:locahub/core/views/homepage/view/widget/search_result/skeleton_product.dart';
 
 class FavoritePage extends StatefulWidget {
-  const FavoritePage({super.key});
+  const FavoritePage({Key? key}) : super(key: key);
 
   @override
   State<FavoritePage> createState() => _FavoritePageState();
@@ -13,49 +21,57 @@ class FavoritePage extends StatefulWidget {
 
 class _FavoritePageState extends State<FavoritePage> {
   bool isLoading = true;
+  late int userId;
+  late FavoriteServices favoriteServices;
+  late UserPrefService userPrefService;
+  final ProductController productC = Get.put(ProductController());
 
   @override
   void initState() {
-    Future.delayed(const Duration(seconds: 2), () {
-      setState(() {
-        isLoading = false;
-      });
-    });
     super.initState();
+    initializeData();
+  }
+
+  Future<void> initializeData() async {
+    await Future.delayed(const Duration(seconds: 2));
+    userPrefService = UserPrefService();
+    String? token = userPrefService.readToken();
+    User user = await MainController().getUsers();
+    userId = user.id!;
+    favoriteServices = FavoriteServices();
+    favoriteServices.fetchFavoriteModels(token!, userId);
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: whiteColor,
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          //normalnya 56
-          toolbarHeight: 80,
-          backgroundColor: Colors.transparent,
-          bottomOpacity: 0.0,
-          elevation: 0.0,
-          centerTitle: true,
-          title: Text(
-            "Favorite",
-            style: darkTextStyle.copyWith(
-                fontSize: 16, fontWeight: FontWeight.w400),
+      backgroundColor: whiteColor,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        toolbarHeight: 80,
+        backgroundColor: Colors.transparent,
+        bottomOpacity: 0.0,
+        elevation: 0.0,
+        centerTitle: true,
+        title: Text(
+          "Favorite",
+          style: darkTextStyle.copyWith(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
           ),
         ),
-        body: Center(
-          child: Text(
-            "Tidak ada data",
-            style: darkTextStyle.copyWith(
-                fontSize: 12, fontWeight: FontWeight.w400),
-          ),
-        )
-        // ListView(
-        //   children: [
-        //     greyContainer(),
-        //     isLoading ? buildLoadingProduct() : buildProduct(),
-        //   ],
-        // )
-        );
+      ),
+      body: ListView(
+        children: [
+          greyContainer(),
+          isLoading ? buildLoadingProduct() : buildProduct(),
+        ],
+      ),
+    );
   }
 
   Widget buildLoadingProduct() {
@@ -78,44 +94,44 @@ class _FavoritePageState extends State<FavoritePage> {
   }
 
   Widget buildProduct() {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16, right: 24, left: 24),
-      child: Wrap(
-        crossAxisAlignment: WrapCrossAlignment.center,
-        spacing: 13,
-        runSpacing: 13,
-        children: const [
-          ProductCard(
-              imageUrl: 'assets/images/product/floresmanggarai.png',
-              name: 'Flores Manggarai 500g',
-              price: 150000,
-              rating: 4.9),
-          ProductCard(
-              imageUrl: 'assets/images/product/floresgourmet.png',
-              name: 'Flores Gourmet Coffee',
-              price: 35000,
-              rating: 4.9),
-          ProductCard(
-              imageUrl: 'assets/images/product/floresbajawa.png',
-              name: 'Flores Bajawa 200g Ko',
-              price: 75000,
-              rating: 5.0),
-          ProductCard(
-              imageUrl: 'assets/images/product/dripcoffee.png',
-              name: 'Drip Coffee 10g Arabic',
-              price: 50000,
-              rating: 4.8),
-          ProductCard(
-              imageUrl: 'assets/images/product/kopirobusta.png',
-              name: 'Kopi Robusta Watuag',
-              price: 25000,
-              rating: 4.5),
-          ProductCard(
-              imageUrl: 'assets/images/product/tehhijaudiet.png',
-              name: 'Single Origin Arabica Fl',
-              price: 80000),
-        ],
-      ),
+    String? token = userPrefService.readToken();
+    return FutureBuilder<List<FavoriteModel>>(
+      future: favoriteServices.fetchFavoriteModels(token!, userId),
+      builder:
+          (BuildContext context, AsyncSnapshot<List<FavoriteModel>> snapshot) {
+        if (snapshot.hasData) {
+          List<FavoriteModel> products = snapshot.data!;
+
+          return Container(
+            margin: const EdgeInsets.only(bottom: 16, right: 24, left: 24),
+            child: GridView.builder(
+              physics: const BouncingScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 13,
+                mainAxisSpacing: 13,
+                childAspectRatio: 2 / 3,
+              ),
+              shrinkWrap: true,
+              itemCount: products.length,
+              itemBuilder: (BuildContext context, int index) {
+                model.Products product = productC.products[index];
+                return ProductCard(
+                  product: product,
+                  imageUrl: product.galleries!.first.url!,
+                  name: product.name!,
+                  price: int.parse(product.price!),
+                  rating: 5.0,
+                );
+              },
+            ),
+          );
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          return buildLoadingProduct();
+        }
+      },
     );
   }
 
@@ -126,4 +142,18 @@ class _FavoritePageState extends State<FavoritePage> {
       color: lightgreyColor,
     );
   }
+}
+
+class Product {
+  final String imageUrl;
+  final String name;
+  final int price;
+  final double rating;
+
+  Product({
+    required this.imageUrl,
+    required this.name,
+    required this.price,
+    this.rating = 0.0,
+  });
 }

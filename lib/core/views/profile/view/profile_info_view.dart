@@ -1,11 +1,9 @@
-//perubahan di menu address dari address jadi address2
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:locahub/core/views/address/view/address.dart';
-import 'package:locahub/core/views/address/view/address_2.dart';
 import 'package:locahub/core/views/homepage/controller/main_controller.dart';
 import 'package:locahub/core/views/notification/view/notification.dart';
 import 'package:locahub/core/views/global/theme.dart';
@@ -293,7 +291,7 @@ class ProfileView extends GetView<ProfileController> {
                         "Alamat",
                         func: () {
                           Get.to(() =>
-                              Address2(onReturnedValue: _handleReturnedValue));
+                              Address(onReturnedValue: _handleReturnedValue));
                         },
                       ),
                       const SizedBox(

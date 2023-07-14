@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:locahub/core/models/product_model.dart';
+import 'package:locahub/core/views/homepage/controller/category_controller.dart';
+import 'package:locahub/core/views/homepage/controller/product_controller.dart';
+
 import 'package:locahub/core/views/homepage/view/widget/search_result/product_card.dart';
 import 'package:locahub/core/views/homepage/view/widget/search_result/skeleton_product.dart';
 import 'package:locahub/core/views/global/theme.dart';
 
-class Health extends StatefulWidget {
-  const Health({super.key});
+class CategoryScreen extends StatefulWidget {
+  const CategoryScreen({super.key, required this.initialIndex});
+  final int initialIndex;
 
   @override
-  State<Health> createState() => _HealthState();
+  State<CategoryScreen> createState() => _CategoryScreenState();
 }
 
-class _HealthState extends State<Health> {
+class _CategoryScreenState extends State<CategoryScreen> {
+  final categoryC = Get.put<CategoryController>;
+  final ProductController productC = Get.put(ProductController());
   bool isLoading = true;
   bool isPrice = true;
 
@@ -27,7 +35,7 @@ class _HealthState extends State<Health> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      initialIndex: 6,
+      initialIndex: widget.initialIndex,
       length: 7,
       child: Scaffold(
         backgroundColor: whiteColor,
@@ -104,24 +112,24 @@ class _HealthState extends State<Health> {
         ),
         body: TabBarView(
           children: [
-            buildBody(),
-            buildBody(),
-            buildBody(),
-            buildBody(),
-            buildBody(),
-            buildBody(),
-            buildBody(),
+            buildBody(category: "Handycraft"),
+            buildBody(category: "Makan & Minum"),
+            buildBody(category: "Herbal"),
+            buildBody(category: "Fashion"),
+            buildBody(category: "Pertanian"),
+            buildBody(category: "Kecantikan"),
+            buildBody(category: "Kesehatan"),
           ],
         ),
       ),
     );
   }
 
-  Widget buildBody() {
+  Widget buildBody({String? category}) {
     return ListView(
       children: [
         greyContainer(),
-        isLoading ? buildLoadingProduct() : buildProduct(),
+        isLoading ? buildLoadingProduct() : buildProduct(category: category),
       ],
     );
   }
@@ -153,44 +161,44 @@ class _HealthState extends State<Health> {
     );
   }
 
-  Widget buildProduct() {
+  Widget buildProduct({String? category}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16, right: 24, left: 24),
-      child: Wrap(
-        crossAxisAlignment: WrapCrossAlignment.center,
-        spacing: 13,
-        runSpacing: 13,
-        children: const [
-          ProductCard(
-              imageUrl: 'assets/images/product/floresmanggarai.png',
-              name: 'Flores Manggarai 500g',
-              price: 150000,
-              rating: 4.9),
-          ProductCard(
-              imageUrl: 'assets/images/product/floresgourmet.png',
-              name: 'Flores Gourmet Coffee',
-              price: 35000,
-              rating: 4.9),
-          ProductCard(
-              imageUrl: 'assets/images/product/floresbajawa.png',
-              name: 'Flores Bajawa 200g Ko',
-              price: 75000,
-              rating: 5.0),
-          ProductCard(
-              imageUrl: 'assets/images/product/dripcoffee.png',
-              name: 'Drip Coffee 10g Arabic',
-              price: 50000,
-              rating: 4.8),
-          ProductCard(
-              imageUrl: 'assets/images/product/kopirobusta.png',
-              name: 'Kopi Robusta Watuag',
-              price: 25000,
-              rating: 4.5),
-          ProductCard(
-              imageUrl: 'assets/images/product/tehhijaudiet.png',
-              name: 'Single Origin Arabica Fl',
-              price: 80000),
-        ],
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 13,
+          mainAxisSpacing: 13,
+          childAspectRatio: 1 / 1.5,
+        ),
+        itemCount: productC.products
+            .where((products) =>
+                products.category!.name ==
+                category) // Replace 'categorySerupaName' with the desired category name
+            .length,
+        itemBuilder: (BuildContext context, int index) {
+          final List<Products> categorySerupa = productC.products
+              .where((products) =>
+                  products.category!.name ==
+                  category) // Replace 'categorySerupaName' with the desired category name
+              .toList();
+
+          if (index >= categorySerupa.length) {
+            return const SizedBox();
+          }
+
+          final product = categorySerupa[index];
+
+          return ProductCard(
+            product: product,
+            imageUrl: product.galleries!.first.url!,
+            name: product.name!,
+            price: int.parse(product.price.toString()),
+            rating: double.parse(product.rating!.first.rating!),
+          );
+        },
       ),
     );
   }

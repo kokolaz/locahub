@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:locahub/core/models/product_model.dart';
 import 'package:locahub/core/views/global/theme.dart';
 import 'package:locahub/core/views/product/view/detail_product.dart';
 import 'package:intl/intl.dart';
@@ -8,13 +9,15 @@ class OtherProductCard extends StatelessWidget {
   final String name;
   final double price;
   final double rating;
+  final Products? product;
 
   const OtherProductCard(
       {super.key,
       required this.imageUrl,
       required this.name,
       this.price = 0,
-      this.rating = 0});
+      this.rating = 0,
+      this.product});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +25,9 @@ class OtherProductCard extends StatelessWidget {
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => const DetailProduct(),
+            builder: (context) => DetailProduct(
+              product: product,
+            ),
           ),
         );
       },
@@ -43,7 +48,7 @@ class OtherProductCard extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 image: DecorationImage(
-                  image: AssetImage(imageUrl),
+                  image: NetworkImage(imageUrl),
                 ),
               ),
             ),

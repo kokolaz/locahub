@@ -62,8 +62,16 @@ class _InvoiceState extends State<Invoice> {
                   fontSize: 16, fontWeight: FontWeight.w400),
             ),
             InkWell(
-              onTap: () async {
-                await generatePdf();
+              onTap: () {
+                saveAndDownloadPdf(
+                    storeAddress: widget.storeAddress,
+                    storeName: widget.storeName,
+                    costCourier: widget.costCourier,
+                    orderan: widget.orderan,
+                    payTotal: widget.payTotal,
+                    quantity: widget.quantity,
+                    totalPrice: widget.totalPrice,
+                    timePay: widget.timePay);
               },
               child: Padding(
                 padding: const EdgeInsets.only(right: 12),

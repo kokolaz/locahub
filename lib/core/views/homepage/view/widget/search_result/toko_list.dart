@@ -24,7 +24,10 @@ class TokoList extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         Get.to(() {
-          return const StorePage(initialIndex: 0);
+          return const StorePage(
+            initialIndex: 0,
+            name: "",
+          );
         });
       },
       child: Card(
@@ -43,7 +46,7 @@ class TokoList extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 image: DecorationImage(
-                    image: AssetImage(imageUrl), fit: BoxFit.cover),
+                    image: NetworkImage(imageUrl), fit: BoxFit.cover),
               ),
             ),
             const SizedBox(width: 10),

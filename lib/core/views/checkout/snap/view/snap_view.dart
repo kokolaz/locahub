@@ -9,6 +9,8 @@ class SnapView extends GetView<SnapController> {
   @override
   Widget build(BuildContext context) {
     Get.lazyPut(() => SnapController());
+    // Get.lazyPut(() => TransactionIndexController());
+
     return Scaffold(
       body: SizedBox(
         height: Get.height,
