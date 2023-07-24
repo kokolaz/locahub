@@ -55,7 +55,6 @@ class ProductController extends GetxController {
         for (var element in data['data']['data']) {
           _listStoreproduct.add(Products.fromJson(element));
         }
-        print(Products.fromJson(data['data']['data']));
       } else {
         throw Exception('Failed to load products');
       }
@@ -88,7 +87,6 @@ class ProductController extends GetxController {
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         _detailProduct.value = ProductDetail.fromJson(data['data']);
-        print("fetch id : ${_detailProduct.value.height!}");
         _isLoadingDetail.value = false;
       } else {
         throw Exception('Failed to load products');

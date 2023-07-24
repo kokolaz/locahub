@@ -3,7 +3,7 @@
 import 'package:locahub/core/services/pref_services/user_pref_service.dart';
 
 class ApiConfig {
-  static String base_url = "http://locahub.my.id";
+  static String base_url = "http://192.168.0.243:8000";
   // static String base_url = "https://167e-180-241-242-132.ap.ngrok.io";
   static String api = "$base_url/api";
   static Map<String, String> header = {

@@ -531,9 +531,10 @@ class _HomePageState extends State<HomePage> {
 
   List<model.Products> _getSortedProductsByRatingLength(
       List<model.Products> products, int index) {
-    products.sort((a, b) => double.parse(b.rating![index].rating!)
+    var sortedProduct = products.where((e) => e.rating!.isNotEmpty).toList();
+    sortedProduct.sort((a, b) => double.parse(b.rating![index].rating!)
         .compareTo(double.parse(a.rating![index].rating!)));
-    return products.where((p) {
+    return sortedProduct.where((p) {
       final rating = double.parse(p.rating![index].rating!);
       return rating >= 4.8 && rating <= 5;
     }).toList();

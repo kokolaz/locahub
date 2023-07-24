@@ -145,10 +145,10 @@ class Products {
   factory Products.fromJson(Map<String, dynamic> json) => Products(
         id: json["id"],
         name: json["name"],
-        price: json["price"],
+        price: json["price"].toString(),
         productsInformation: json["products_information"],
-        categoriesId: json["categories_id"],
-        storeId: json["store_id"],
+        categoriesId: json["categories_id"].toString(),
+        storeId: json["store_id"].toString(),
         tags: json["tags"],
         height: json["height"],
         wide: json["wide"],
@@ -210,7 +210,7 @@ class Category {
   factory Category.fromJson(Map<String, dynamic> json) => Category(
         id: json["id"],
         name: json["name"],
-        storeId: json["store_id"],
+        storeId: json["store_id"].toString(),
         createdAt: json["created_at"],
         updatedAt: json["updated_at"],
       );
@@ -243,7 +243,7 @@ class Gallery {
 
   factory Gallery.fromJson(Map<String, dynamic> json) => Gallery(
         id: json["id"],
-        productsId: json["products_id"],
+        productsId: json["products_id"].toString(),
         url: json["url"],
         deletedAt: json["deleted_at"],
         createdAt: json["created_at"],
@@ -287,11 +287,11 @@ class Rating {
 
   factory Rating.fromJson(Map<String, dynamic> json) => Rating(
         id: json["id"],
-        userId: json["user_id"],
-        productsId: json["products_id"],
+        userId: json["user_id"].toString(),
+        productsId: json["products_id"].toString(),
         content: json["content"],
-        status: json["status"],
-        rating: json["rating"],
+        status: json["status"].toString(),
+        rating: json["rating"].toString(),
         url: json["url"],
         deletedAt: json["deleted_at"],
         createdAt: json["created_at"],
@@ -351,10 +351,10 @@ class Store {
 
   factory Store.fromJson(Map<String, dynamic> json) => Store(
         id: json["id"],
-        userId: json["user_id"],
-        couriersId: json["couriers_id"],
-        dayId: json["day_id"],
-        cityId: json["city_id"],
+        userId: json["user_id"].toString(),
+        couriersId: json["couriers_id"].toString(),
+        dayId: json["day_id"].toString(),
+        cityId: json["city_id"].toString(),
         name: json["name"],
         profile: json["profile"],
         image: json["image"],
@@ -411,10 +411,10 @@ class Variation {
 
   factory Variation.fromJson(Map<String, dynamic> json) => Variation(
         id: json["id"],
-        productsId: json["products_id"],
+        productsId: json["products_id"].toString(),
         name: json["name"],
         detail: json["detail"],
-        productsPrice: json["products_price"],
+        productsPrice: json["products_price"].toString(),
         deletedAt: json["deleted_at"],
         createdAt: json["created_at"],
         updatedAt: json["updated_at"],
