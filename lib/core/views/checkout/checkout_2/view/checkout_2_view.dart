@@ -1470,11 +1470,8 @@ class _Checkout2ViewState extends State<Checkout2View> {
                                             symbol: "Rp. ",
                                             decimalDigits: 0,
                                           ).format(
-                                            int.tryParse(controller
-                                                        .selectedProducts[i]
-                                                    ["items"][j]["price"]) ??
-                                                0,
-                                          ),
+                                              controller.selectedProducts[i]
+                                                  ["items"][j]["price"]),
                                           style: GoogleFonts.poppins(
                                             fontSize: 14,
                                             fontWeight: FontWeight.bold,

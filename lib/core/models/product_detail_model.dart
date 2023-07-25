@@ -294,7 +294,7 @@ class Store {
         image: json["image"],
         url: json["url"],
         username: json["username"],
-        addres: json["addres"],
+        addres: json["address"],
         description: json["description"],
         storeNote: json["store_note"],
         deletedAt: json["deleted_at"],

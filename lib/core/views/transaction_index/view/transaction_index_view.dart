@@ -157,21 +157,20 @@ class TransactionIndexView extends GetView<TransactionIndexController> {
                                     ["payment_status"],
                                 courier: controller.transactions[i]
                                     ["store_transactions"][j]["courier"],
-                                costCourier: int.parse(controller
-                                        .transactions[i]["store_transactions"]
-                                    [j]["shipping_cost"]),
+                                costCourier: controller.transactions[i]
+                                    ["store_transactions"][j]["shipping_cost"],
                                 invoice: controller.transactions[i]["code"],
-                                price: int.parse(controller.transactions[i]
+                                price: controller.transactions[i]
                                         ["store_transactions"][j]["items"][k]
-                                    ["price"]),
+                                    ["price"],
                                 storeName: controller.transactions[i]
                                     ["store_transactions"][j]["store"]["name"],
                                 productName: controller.transactions[i]
                                         ["store_transactions"][j]["items"][k]
                                     ["product"]["name"],
-                                quantity: int.parse(controller.transactions[i]
+                                quantity: controller.transactions[i]
                                         ["store_transactions"][j]["items"][k]
-                                    ["quantity"]),
+                                    ["quantity"],
                                 timeOrder: controller.transactions[i]
                                     ["updated_at"],
                                 alamat: "Alamat",
@@ -328,17 +327,18 @@ class TransactionIndexView extends GetView<TransactionIndexController> {
                                                           .spaceBetween,
                                                   children: [
                                                     Text(
-                                                      intl.NumberFormat.currency(
-                                                              symbol: "Rp. ",
-                                                              decimalDigits: 0)
-                                                          .format(int.tryParse(controller
-                                                                              .transactions[i]
-                                                                          ["store_transactions"]
-                                                                      [
-                                                                      j]["items"]
+                                                      intl.NumberFormat
+                                                              .currency(
+                                                                  symbol:
+                                                                      "Rp. ",
+                                                                  decimalDigits:
+                                                                      0)
+                                                          .format(controller
+                                                                      .transactions[i]
                                                                   [
-                                                                  k]["price"]) ??
-                                                              0),
+                                                                  "store_transactions"][j]
+                                                              [
+                                                              "items"][k]["price"]),
                                                       style:
                                                           GoogleFonts.poppins(
                                                         fontSize: 14,

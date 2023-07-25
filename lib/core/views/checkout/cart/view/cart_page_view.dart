@@ -271,14 +271,9 @@ class CartPageView extends GetView<CartController> {
                                                     name: "IDR",
                                                     symbol: "Rp. ",
                                                     decimalDigits: 0,
-                                                  ).format(
-                                                    int.tryParse(controller
-                                                                        .cart[i]
-                                                                    ["carts"][j]
-                                                                ["product"]
-                                                            ["price"]) ??
-                                                        0,
-                                                  ),
+                                                  ).format(controller.cart[i]
+                                                        ["carts"][j]["product"]
+                                                    ["price"]),
                                             style: GoogleFonts.poppins(
                                               fontWeight: FontWeight.w700,
                                               fontSize: 14,

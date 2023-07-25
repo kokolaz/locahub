@@ -362,7 +362,7 @@ class Checkout2Controller extends GetxController {
     var tempitemTotalPrice = 0;
     for (var i in selectedProducts) {
       i["items"].forEach((j) {
-        int tempItemPrice = int.tryParse(j["price"]) ?? 0;
+        int tempItemPrice = (j["price"]);
         int tempItemQty = int.tryParse(j["qty"].toString()) ?? 0;
         int tempSubTotal = tempItemPrice * tempItemQty;
         tempitemTotalPrice += tempSubTotal;
